@@ -1,0 +1,157 @@
+'''
+ * 解压缩小程序 版本1.0
+
+ *
+ * 版权归 AlexJason 所有
+
+ * 制作者: AlexJason (hyc6446@outlook.com)
+'''
+# coding=utf-8
+import tkinter
+import tkinter.filedialog
+import zipfile
+import os
+import tkinter.messagebox
+import time
+
+
+class Compress:
+
+    def __init__(self):
+        #初始化属性
+        self.pathfile = ''
+        self.root = tkinter.Tk()
+        self.root.title('解压缩文件')
+        self.root.resizable(0,0)
+        self.root.geometry('700x430')
+        self.topimg = tkinter.PhotoImage(file='./top.png')
+        self.bomimg = tkinter.PhotoImage(file='./bom.gif')
+        self.btnimg = tkinter.PhotoImage(file='./btn.png')
+        self.btnimg1 = tkinter.PhotoImage(file='./btn1.png')
+
+        #调用函数
+        self.mainlabel()
+        self.addfunc()
+        self.root.mainloop()
+        # s初始化背景图
+
+    #主界面函数
+    def mainlabel(self):
+
+        toplab = tkinter.Label(text='解压缩文件小程序',font=('微软雅黑',14),fg='#f3a450',bg='#fff',image=self.topimg,compound='center')
+        toplab.place(x=0,y=0,width=700,height=62)
+
+        midlab = tkinter.Label(bg='#fff',image=self.bomimg,compound='center')
+        midlab.place(x=0,y=64,width=700,height=366)
+
+        self.viewlab = tkinter.Label(bg='#f6f2ee',anchor='nw',justify = 'left')
+        self.viewlab.place(x=15,y=130,width=670,height=275)
+
+        self.funcbtn1 = tkinter.Button(text='选择文件',image=self.btnimg,compound='center',fg='#fff',border=0,
+                                 font=('微软雅黑',14),cursor='hand2')
+        self.funcbtn1.place(width='113',height='43',x=50,y=75)
+
+        self.funcbtn2 = tkinter.Button(self.root,text='压缩文件',image=self.btnimg,compound='center',fg='#fff',border=0,
+                                 font=('微软雅黑',14),cursor='hand2')
+        self.funcbtn2.place(width='113',height='43',x=290,y=75)
+
+        self.funcbtn3 = tkinter.Button(self.root,text='解压文件',image=self.btnimg,compound='center',fg='#fff',border=0,
+                                 font=('微软雅黑',14),cursor='hand2')
+        self.funcbtn3.place(width='113',height='43',x=560,y=75)
+
+
+    #为按钮添加方法
+    def addfunc(self):
+
+        #基本功能
+        self.funcbtn1.bind('<ButtonRelease-1>',self.selectfiles)
+        self.funcbtn2.bind('<ButtonRelease-1>', self.comfiles)
+        self.funcbtn3.bind('<ButtonRelease-1>', self.relfiles)
+
+        #练习事件
+        self.funcbtn1.bind('<Enter>',self.funcbtn1hover)
+        self.funcbtn1.bind('<Leave>',self.funcbtn1leave)
+        self.funcbtn2.bind('<Enter>',self.funcbtn2hover)
+        self.funcbtn2.bind('<Leave>',self.funcbtn2leave)
+        self.funcbtn3.bind('<Enter>',self.funcbtn3hover)
+        self.funcbtn3.bind('<Leave>',self.funcbtn3leave)
+
+
+    #选择文件方法
+    def selectfiles(self,e):
+
+        self.pathfile = tkinter.filedialog.askopenfilenames(title='选择文件')
+        if len(self.pathfile) == 0:
+            self.viewlab['text'] = ''
+        else:
+            self.viewlab['text'] = '\n\r'.join(self.pathfile)
+            self.sign = True
+
+    #压缩文件
+    def comfiles(self,e):
+        if len(self.pathfile) == 0:
+            tkinter.messagebox.showinfo(message='请选择文件')
+        else:
+            self.savepath = tkinter.filedialog.asksaveasfilename(title='选择文件夹',filetypes=(('文件类型','*.zip'),))
+            if self.savepath == '':
+                self.aa = tkinter.messagebox.askokcancel(message='确认要放弃压缩吗？')
+                if self.aa == True:
+                    time.sleep(1)
+                    self.viewlab['text'] = ''
+                    self.pathfile = ''
+                else:
+                    self.comfiles(self)
+            else:
+                zp = zipfile.ZipFile(self.savepath + '.zip', 'w', zipfile.ZIP_DEFLATED)
+
+                for i in self.pathfile:
+                    zp.write(i, os.path.basename(i))
+                zp.close()
+                tipinfo = tkinter.messagebox.showinfo(message='压缩完成')
+                if tipinfo == 'ok':
+                    time.sleep(1)
+                    self.viewlab['text'] = ''
+                    self.pathfile = ''
+
+
+    #解压文件
+    def relfiles(self,e):
+        relpath = tkinter.filedialog.askopenfilename(title='选择解压文件',filetypes=(('文件类型','*.zip'),('文件类型','*.tar')))
+        if len(relpath) == 0:
+            return
+        else:
+            savepath = tkinter.filedialog.askdirectory(title='选择压缩位置')
+            zp = zipfile.ZipFile(relpath,'r')
+            zp.extractall(savepath)
+            tkinter.messagebox.showinfo(message='解压完成')
+
+
+    def funcbtn1hover(self,e):
+        self.funcbtn1['image']=self.btnimg1
+
+    def funcbtn1leave(self,e):
+        self.funcbtn1['image'] = self.btnimg
+
+    def funcbtn2hover(self,e):
+        self.funcbtn2['image']=self.btnimg1
+
+    def funcbtn2leave(self,e):
+        self.funcbtn2['image'] = self.btnimg
+
+    def funcbtn3hover(self,e):
+        self.funcbtn3['image']=self.btnimg1
+
+    def funcbtn3leave(self,e):
+        self.funcbtn3['image'] = self.btnimg
+
+
+
+c = Compress()
+
+if __name__ == '__mian__':
+    pass
+
+
+
+
+
